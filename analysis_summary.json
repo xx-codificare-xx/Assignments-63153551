@@ -1,0 +1,23 @@
+{
+  "naive_coef": 4.1253,
+  "naive_pval": 0.0,
+  "psm_coef": 3.2581,
+  "psm_pval": 0.0,
+  "shift": -0.8672,
+  "treated_ps_min": 0.3515,
+  "treated_ps_max": 0.9519,
+  "control_ps_min": 0.338,
+  "control_ps_max": 0.7999,
+  "smd_before": {
+    "ANNUAL_REV": 0.4103,
+    "TEAM_SIZE": 0.443,
+    "FOUNDED": -0.1218,
+    "DIGITAL_SALES": 0.4389
+  },
+  "smd_after": {
+    "ANNUAL_REV": 0.175,
+    "TEAM_SIZE": 0.1938,
+    "FOUNDED": -0.0189,
+    "DIGITAL_SALES": 0.1521
+  }
+}
