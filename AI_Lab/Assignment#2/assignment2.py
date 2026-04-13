@@ -137,4 +137,165 @@ print(f"\n[CLEAN] {len(df)} rows after cleaning.")
 print(f"Treatment (AI): {len(treat)} | Control (Manual): {len(ctrl)}")
 
 
+# STAGE 3: ANALYZE THE DATA
+# Run balance tests to verify randomization, perform
+# t-tests for ignorability assumption, justify SUTVA, and
+# compute ATE for productivity (TASKS_COMPLETED) and quality
+# (ERROR_RATE). Save boxplots for the tex file.
+
+print("\n" + "="*60)
+print("STAGE 3A: BALANCE TEST")
+print("="*60)
+
+# Compare baseline characteristics between treatment and
+# control groups to verify that randomization was successful
+baseline_vars = ['YEARS_EXP', 'BASELINE_TASKS', 'BASELINE_ERROR', 'TRAINING_SCORE']
+
+balance_rows = []
+for var in baseline_vars:
+    t_mean = treat[var].mean()
+    c_mean = ctrl[var].mean()
+    t_std  = treat[var].std()
+    c_std  = ctrl[var].std()
+    t_stat, p_val = stats.ttest_ind(treat[var].dropna(), ctrl[var].dropna())
+    balance_rows.append({
+        'Variable':        var,
+        'Treatment Mean':  round(t_mean, 3),
+        'Control Mean':    round(c_mean, 3),
+        'Treatment Std':   round(t_std, 3),
+        'Control Std':     round(c_std, 3),
+        't-stat':          round(t_stat, 3),
+        'p-value':         round(p_val, 4),
+        'Balanced?':       'Yes' if p_val > 0.05 else 'No'
+    })
+
+balance_df = pd.DataFrame(balance_rows)
+print(balance_df.to_string(index=False))
+
+print("\n" + "="*60)
+print("STAGE 3B: IGNORABILITY ASSUMPTION (t-tests)")
+print("="*60)
+# Verify ignorability — no statistically significant
+# differences in pre-treatment variables between groups
+for _, row in balance_df.iterrows():
+    status = "PASS" if row['p-value'] > 0.05 else "FAIL"
+    print(f"  {row['Variable']:<22}: p={row['p-value']:.4f}  [{status}]")
+
+print("\n" + "="*60)
+print("STAGE 3C: SUTVA JUSTIFICATION")
+print("="*60)
+print("""
+  SUTVA (Stable Unit Treatment Value Assumption) requires:
+  1. No spillover effects between units.
+  2. Only one version of the treatment exists.
+
+  Justification: In this RCT, clerks process loan applications
+  independently on individual workstations. Each clerk's output
+  is self-contained — one clerk's use of the AI tool does not
+  affect another clerk's task queue or error rate. The AI tool
+  (PDF pre-fill extraction) operates at the individual session
+  level, and clerks were physically separated across Day and
+  Evening shifts at two sites (Irvine and Phoenix). Group
+  assignments were randomized within each site and queue,
+  further minimizing any risk of spillover. SUTVA is satisfied.
+""")
+
+print("="*60)
+print("STAGE 3D: ATE ESTIMATION")
+print("="*60)
+
+# Calculate ATE for productivity — mean difference in
+# TASKS_COMPLETED between treatment and control groups
+ate_tasks = treat['TASKS_COMPLETED'].mean() - ctrl['TASKS_COMPLETED'].mean()
+t_stat_tasks, p_tasks = stats.ttest_ind(treat['TASKS_COMPLETED'], ctrl['TASKS_COMPLETED'])
+
+# Calculate ATE for quality — mean difference in
+# ERROR_RATE between treatment and control groups
+ate_error = treat['ERROR_RATE'].mean() - ctrl['ERROR_RATE'].mean()
+t_stat_err, p_error = stats.ttest_ind(treat['ERROR_RATE'], ctrl['ERROR_RATE'])
+
+print(f"\n  PRODUCTIVITY (TASKS_COMPLETED):")
+print(f"    Treatment Mean : {treat['TASKS_COMPLETED'].mean():.2f} tasks")
+print(f"    Control Mean   : {ctrl['TASKS_COMPLETED'].mean():.2f} tasks")
+print(f"    ATE            : {ate_tasks:+.2f} tasks  (p={p_tasks:.4f})")
+
+print(f"\n  QUALITY (ERROR_RATE):")
+print(f"    Treatment Mean : {treat['ERROR_RATE'].mean():.2f}%")
+print(f"    Control Mean   : {ctrl['ERROR_RATE'].mean():.2f}%")
+print(f"    ATE            : {ate_error:+.2f}%  (p={p_error:.4f})")
+
+# Run OLS regression of TASKS_COMPLETED on TREATMENT
+# controlling for baseline covariates to confirm ATE estimate
+X_prod = sm.add_constant(df[['TREATMENT', 'YEARS_EXP', 'BASELINE_TASKS', 'TRAINING_SCORE']])
+ols_prod = sm.OLS(df['TASKS_COMPLETED'], X_prod).fit()
+
+X_qual = sm.add_constant(df[['TREATMENT', 'YEARS_EXP', 'BASELINE_ERROR', 'TRAINING_SCORE']])
+ols_qual = sm.OLS(df['ERROR_RATE'], X_qual).fit()
+
+print(f"\n  OLS (controlling for baseline covariates):")
+print(f"    TASKS_COMPLETED ~ TREATMENT coef: {ols_prod.params['TREATMENT']:+.4f}  (p={ols_prod.pvalues['TREATMENT']:.4f})")
+print(f"    ERROR_RATE      ~ TREATMENT coef: {ols_qual.params['TREATMENT']:+.4f}  (p={ols_qual.pvalues['TREATMENT']:.4f})")
+
+# Generate boxplots of productivity and error rate
+# by treatment group for inclusion in the tex report
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Productivity boxplot
+data_tasks = [ctrl['TASKS_COMPLETED'].dropna(), treat['TASKS_COMPLETED'].dropna()]
+bp1 = axes[0].boxplot(data_tasks, patch_artist=True,
+                       tick_labels=['Control\n(Manual)', 'Treatment\n(AI Tool)'])
+bp1['boxes'][0].set_facecolor('#f28b82')
+bp1['boxes'][1].set_facecolor('#87c5f5')
+axes[0].set_title('Productivity: Tasks Completed per Shift', fontsize=12, fontweight='bold')
+axes[0].set_ylabel('Tasks Completed')
+axes[0].grid(axis='y', alpha=0.3)
+axes[0].annotate(f'ATE = {ate_tasks:+.2f}\np = {p_tasks:.4f}',
+                 xy=(0.72, 0.05), xycoords='axes fraction', fontsize=10,
+                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+
+# Error rate boxplot
+data_error = [ctrl['ERROR_RATE'].dropna(), treat['ERROR_RATE'].dropna()]
+bp2 = axes[1].boxplot(data_error, patch_artist=True,
+                       tick_labels=['Control\n(Manual)', 'Treatment\n(AI Tool)'])
+bp2['boxes'][0].set_facecolor('#f28b82')
+bp2['boxes'][1].set_facecolor('#87c5f5')
+axes[1].set_title('Quality: Error Rate per Shift', fontsize=12, fontweight='bold')
+axes[1].set_ylabel('Error Rate (%)')
+axes[1].grid(axis='y', alpha=0.3)
+axes[1].annotate(f'ATE = {ate_error:+.2f}%\np = {p_error:.4f}',
+                 xy=(0.72, 0.88), xycoords='axes fraction', fontsize=10,
+                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+
+plt.tight_layout()
+plt.savefig('rct_boxplots.png', dpi=150, bbox_inches='tight')
+plt.close()
+print("\n[ANALYZE] Saved rct_boxplots.png")
+
+# Save summary for interpretation and tex file
+summary = {
+    'n_treatment': int(len(treat)),
+    'n_control':   int(len(ctrl)),
+    'ate_tasks':   round(ate_tasks, 4),
+    'p_tasks':     round(p_tasks, 4),
+    'ate_error':   round(ate_error, 4),
+    'p_error':     round(p_error, 4),
+    'mean_tasks_treat': round(treat['TASKS_COMPLETED'].mean(), 2),
+    'mean_tasks_ctrl':  round(ctrl['TASKS_COMPLETED'].mean(), 2),
+    'mean_error_treat': round(treat['ERROR_RATE'].mean(), 2),
+    'mean_error_ctrl':  round(ctrl['ERROR_RATE'].mean(), 2),
+    'ols_treat_coef_tasks': round(float(ols_prod.params['TREATMENT']), 4),
+    'ols_treat_pval_tasks': round(float(ols_prod.pvalues['TREATMENT']), 4),
+    'ols_treat_coef_error': round(float(ols_qual.params['TREATMENT']), 4),
+    'ols_treat_pval_error': round(float(ols_qual.pvalues['TREATMENT']), 4),
+    'balance': [
+        {'var': r['Variable'], 't_mean': r['Treatment Mean'],
+         'c_mean': r['Control Mean'], 'pval': r['p-value'], 'balanced': r['Balanced?']}
+        for _, r in balance_df.iterrows()
+    ]
+}
+with open('analysis_summary_a2.json', 'w') as f:
+    json.dump(summary, f, indent=2)
+print("[ANALYZE] Saved analysis_summary_a2.json")
+
+
 

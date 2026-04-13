@@ -1,0 +1,46 @@
+{
+  "n_treatment": 71,
+  "n_control": 70,
+  "ate_tasks": 8.6682,
+  "p_tasks": 0.0,
+  "ate_error": 0.5695,
+  "p_error": 0.0002,
+  "mean_tasks_treat": 79.23,
+  "mean_tasks_ctrl": 70.56,
+  "mean_error_treat": 2.84,
+  "mean_error_ctrl": 2.27,
+  "ols_treat_coef_tasks": 9.5475,
+  "ols_treat_pval_tasks": 0.0,
+  "ols_treat_coef_error": 0.574,
+  "ols_treat_pval_error": 0.0,
+  "balance": [
+    {
+      "var": "YEARS_EXP",
+      "t_mean": 4.794,
+      "c_mean": 4.677,
+      "pval": 0.7401,
+      "balanced": "Yes"
+    },
+    {
+      "var": "BASELINE_TASKS",
+      "t_mean": 8.638,
+      "c_mean": 8.761,
+      "pval": 0.5691,
+      "balanced": "Yes"
+    },
+    {
+      "var": "BASELINE_ERROR",
+      "t_mean": 2.248,
+      "c_mean": 2.25,
+      "pval": 0.9865,
+      "balanced": "Yes"
+    },
+    {
+      "var": "TRAINING_SCORE",
+      "t_mean": 15921.239,
+      "c_mean": 17603.857,
+      "pval": 0.7733,
+      "balanced": "Yes"
+    }
+  ]
+}
