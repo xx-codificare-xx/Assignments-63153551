@@ -298,4 +298,46 @@ with open('analysis_summary_a2.json', 'w') as f:
 print("[ANALYZE] Saved analysis_summary_a2.json")
 
 
+# STAGE 4: INTERPRET THE DATA
+# Load analysis summary and print structured
+# interpretation covering marginal productivity gain,
+# quantity-quality trade-off, and implications for firms
+# considering broad deployment of AI assistants.
 
+with open('analysis_summary_a2.json', 'r') as f:
+    s = json.load(f)
+
+print("\n" + "="*65)
+print("STAGE 4: INTERPRETATION OF RCT RESULTS")
+print("="*65)
+
+sig_tasks = "statistically significant" if s['p_tasks'] < 0.05 else "not statistically significant"
+sig_error = "statistically significant" if s['p_error'] < 0.05 else "not statistically significant"
+direction = "increase" if s['ate_error'] > 0 else "decrease"
+
+print(f"""
+MARGINAL PRODUCTIVITY GAIN
+  Treatment Mean Tasks : {s['mean_tasks_treat']} tasks/shift
+  Control Mean Tasks   : {s['mean_tasks_ctrl']} tasks/shift
+  ATE (Productivity)   : {s['ate_tasks']:+.2f} tasks  (p={s['p_tasks']:.4f}, {sig_tasks})
+
+  Clerks assigned to the AI extraction tool completed on average
+  {abs(s['ate_tasks']):.2f} more tasks per shift than manual clerks.
+  This represents a {abs(s['ate_tasks']/s['mean_tasks_ctrl']*100):.1f}% productivity gain
+  attributable directly to the AI tool.
+
+QUANTITY-QUALITY TRADE-OFF
+  Treatment Mean Error : {s['mean_error_treat']}%
+  Control Mean Error   : {s['mean_error_ctrl']}%
+  ATE (Error Rate)     : {s['ate_error']:+.2f}%  (p={s['p_error']:.4f}, {sig_error})
+
+  The AI tool was associated with a {abs(s['ate_error']):.2f} percentage point
+  {direction} in error rates. {'This suggests a quantity-quality trade-off — clerks processed more applications but with slightly higher errors.' if s['ate_error'] > 0 else 'This is a favorable result — the AI tool improved both quantity and quality simultaneously.'}
+
+IMPLICATIONS FOR FIRMS
+  The RCT design ensures the estimated ATE is causal. AI tool
+  deployment yields meaningful productivity gains with {'a modest quality cost worth monitoring.' if s['ate_error'] > 0 else 'no quality degradation.'} Firms should
+  consider targeted training to help clerks verify AI-prefilled
+  fields before submission, which could preserve speed gains
+  while closing any quality gap.
+""")
