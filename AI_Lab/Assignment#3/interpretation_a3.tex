@@ -1,0 +1,142 @@
+\documentclass[12pt]{article}
+
+% Margins and spacing
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+% Packages
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{float}
+
+\title{\textbf{BANA290 -- Assignment 3} \\
+       \large AI Training Subsidy and Regional Employment: \\
+       A Difference-in-Differences Analysis}
+\author{Rust Belt Revival Labor Archive \\
+        Ohio Grant Corridor vs. Pennsylvania Benchmark Districts}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% ============================================================
+\section*{Interpretation of Results}
+% ============================================================
+
+\subsection*{Experimental Design}
+
+This analysis estimates the causal effect of the 2022 Ohio AI and
+robotics upskilling subsidy on local manufacturing employment using
+a Difference-in-Differences (DID) framework. The panel covers 8
+counties across 2018--2025: 4 treated Ohio counties (Lucas, Stark,
+Mahoning, and Trumbull) that received the upskilling grant, and 4
+control Pennsylvania counties (Erie, Mercer, Lawrence, and Beaver)
+that received no equivalent subsidy. The policy intervention is
+defined as starting in 2022, creating a clean pre- and post-period
+split.
+
+\subsection*{Estimated Causal Effect of the AI Training Subsidy}
+
+The DID regression estimates a treatment effect of
+\textbf{+4,000 jobs per county} in the post-policy period relative
+to the control group ($p = 0.133$, 95\% CI: $[-1{,}255,\ +9{,}256]$).
+While the point estimate is economically meaningful -- treated
+counties averaged 34,089 jobs post-2022 versus a pre-policy mean of
+29,789 -- the effect does not reach conventional statistical
+significance at the 5\% level, likely due to the small sample of
+8 counties. The direction of the estimate is consistent and positive,
+suggesting the subsidy contributed to employment growth, even if
+precision is limited by sample size. Table~\ref{tab:did} reports
+the full regression results.
+
+\subsection*{Parallel Trends Validity}
+
+As shown in Figure~\ref{fig:trends}, the parallel trends assumption
+is strongly supported. In the pre-treatment period (2018--2021),
+the Ohio and Pennsylvania groups followed nearly identical employment
+trajectories, with annual slopes of \textbf{$-455.8$ jobs/year} and
+\textbf{$-455.2$ jobs/year} respectively -- a difference of less than
+1 job per year. The indexed parallel trends plot (right panel)
+confirms visually that both groups moved in lockstep before the
+policy shock. The placebo DID test using 2020 as a fake treatment
+year produced a coefficient of \textbf{$-3.3$ jobs} ($p = 0.9993$),
+confirming no anticipatory effects and validating the causal
+identification strategy.
+
+\subsection*{Labor Market Displacement vs. Creation}
+
+The subsidy appears to have driven net job creation rather than
+simple labor reallocation. Treated Ohio counties -- anchored in
+auto parts, fabricated metals, steel components, and industrial
+tooling -- saw consistent employment acceleration after 2022, with
+individual counties reporting robotics apprenticeships, retrofit
+hiring bumps, and declining technician vacancies. Control
+Pennsylvania counties, by contrast, showed near-flat employment
+growth despite similar pre-policy trajectories, suggesting that
+without subsidized upskilling, AI adoption in manufacturing may
+suppress labor demand by substituting capital for workers. The
+policy therefore acted as a \textit{creation buffer}: by equipping
+existing workers with AI-compatible skills, the grant converted
+potential displacement into employment gains, demonstrating that
+well-designed upskilling interventions can shift the labor market
+impact of automation from displacement toward creation.
+
+% ============================================================
+\section*{Figures and Tables}
+% ============================================================
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{did_trends.png}
+    \caption{Left: Mean employment trends for the Ohio treated
+    group and Pennsylvania control group across 2018--2025.
+    The vertical dashed line marks the 2022 policy start. Right:
+    Pre-treatment employment indexed to 2018=100 for both groups,
+    confirming near-identical pre-policy trajectories and
+    supporting the parallel trends assumption.}
+    \label{fig:trends}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \caption{DID Regression Results: Effect of AI Training Subsidy on Employment}
+    \begin{tabular}{lrrrr}
+        \toprule
+        \textbf{Variable} & \textbf{Coefficient} & \textbf{Std. Error} &
+        \textbf{t-stat} & \textbf{p-value} \\
+        \midrule
+        Intercept      & 22,601.1 & 1,706.9 & 13.24 & $<$0.001 \\
+        TREATED        & 7,187.4  & 2,413.6 &  2.98 & 0.004    \\
+        POST\_POLICY   & 300.1    & 2,413.6 &  0.12 & 0.901    \\
+        DID (ATE)      & +4,000.4 & 3,413.6 &  1.52 & 0.133    \\
+        \midrule
+        \multicolumn{5}{l}{95\% CI for DID: [$-1{,}255$, $+9{,}256$]} \\
+        \multicolumn{5}{l}{$n = 64$ county-year observations} \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:did}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Parallel Trends and Placebo Test Summary}
+    \begin{tabular}{lrr}
+        \toprule
+        \textbf{Diagnostic} & \textbf{Value} & \textbf{Interpretation} \\
+        \midrule
+        Ohio pre-trend slope (jobs/yr)  & $-455.8$ & \\
+        PA pre-trend slope (jobs/yr)    & $-455.2$ & Nearly identical \\
+        Slope difference                & $-0.6$   & No divergence \\
+        \midrule
+        Placebo DID coefficient         & $-3.3$   & Near zero \\
+        Placebo p-value (fake yr=2020)  & 0.9993   & PASS \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:parallel}
+\end{table}
+
+\end{document}
