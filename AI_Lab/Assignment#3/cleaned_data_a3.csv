@@ -1,0 +1,65 @@
+REGION,STATE_GROUP,PROGRAM_STATUS,ANCHOR_INDUSTRY,TREATED,YEAR,EMPLOYMENT_RAW,EMPLOYMENT,POST_POLICY,DID
+"Lucas Cnty, Ohio",Ohio funded corridor,AI Grant County,Auto parts and machining,1,2018,"32,620",32620,0,0
+Stark County / OH,Ohio funded corridor,Grant Zone,Fabricated metals,1,2018,35.7 thousand,35700,0,0
+Mahoning County - Ohio,Ohio funded corridor,Upskilling Cohort,Steel components,1,2018,"29,210",29210,0,0
+"Trumbull Cnty., OH",Ohio funded corridor,Treated,Industrial tooling,1,2018,24.9 thousand,24900,0,0
+Erie County (PA),Pennsylvania benchmark district,Comparison Area,Machine shops,0,2018,"30,860",30860,0,0
+"Mercer Cnty, Pennsylvania",Pennsylvania benchmark district,No Grant,Plastics and molds,0,2018,18.5 thousand,18500,0,0
+Lawrence County - PA,Pennsylvania benchmark district,Benchmark County,Warehouse fabrication,0,2018,"17,285",17285,0,0
+"Beaver Cnty., PA",Pennsylvania benchmark district,Control,Chemicals and fabricated parts,0,2018,27.0 thousand,27000,0,0
+"Lucas Cnty, Ohio",Ohio funded corridor,AI Grant County,Auto parts and machining,1,2019,"32,055 jobs",32055,0,0
+Stark County / OH,Ohio funded corridor,Grant Zone,Fabricated metals,1,2019,35.2k,35200,0,0
+Mahoning County - Ohio,Ohio funded corridor,Upskilling Cohort,Steel components,1,2019,"28,720 jobs",28720,0,0
+"Trumbull Cnty., OH",Ohio funded corridor,Treated,Industrial tooling,1,2019,24.5k,24500,0,0
+Erie County (PA),Pennsylvania benchmark district,Comparison Area,Machine shops,0,2019,"30,327 jobs",30327,0,0
+"Mercer Cnty, Pennsylvania",Pennsylvania benchmark district,No Grant,Plastics and molds,0,2019,18.1k,18100,0,0
+Lawrence County - PA,Pennsylvania benchmark district,Benchmark County,Warehouse fabrication,0,2019,"16,821 jobs",16821,0,0
+"Beaver Cnty., PA",Pennsylvania benchmark district,Control,Chemicals and fabricated parts,0,2019,26.5k,26500,0,0
+"Lucas Cnty, Ohio",Ohio funded corridor,AI Grant County,Auto parts and machining,1,2020,~30.9k,30900,0,0
+Stark County / OH,Ohio funded corridor,Grant Zone,Fabricated metals,1,2020,34.1 K,34100,0,0
+Mahoning County - Ohio,Ohio funded corridor,Upskilling Cohort,Steel components,1,2020,~27.5k,27500,0,0
+"Trumbull Cnty., OH",Ohio funded corridor,Treated,Industrial tooling,1,2020,23.3 K,23300,0,0
+Erie County (PA),Pennsylvania benchmark district,Comparison Area,Machine shops,0,2020,~29.2k,29200,0,0
+"Mercer Cnty, Pennsylvania",Pennsylvania benchmark district,No Grant,Plastics and molds,0,2020,16.9 K,16900,0,0
+Lawrence County - PA,Pennsylvania benchmark district,Benchmark County,Warehouse fabrication,0,2020,~15.7k,15700,0,0
+"Beaver Cnty., PA",Pennsylvania benchmark district,Control,Chemicals and fabricated parts,0,2020,25.3 K,25300,0,0
+"Lucas Cnty, Ohio",Ohio funded corridor,AI Grant County,Auto parts and machining,1,2021,31.4 thousand,31400,0,0
+Stark County / OH,Ohio funded corridor,Grant Zone,Fabricated metals,1,2021,"34,600",34600,0,0
+Mahoning County - Ohio,Ohio funded corridor,Upskilling Cohort,Steel components,1,2021,28.1 thousand,28100,0,0
+"Trumbull Cnty., OH",Ohio funded corridor,Treated,Industrial tooling,1,2021,"23,811",23811,0,0
+Erie County (PA),Pennsylvania benchmark district,Comparison Area,Machine shops,0,2021,29.7 thousand,29700,0,0
+"Mercer Cnty, Pennsylvania",Pennsylvania benchmark district,No Grant,Plastics and molds,0,2021,"17,404",17404,0,0
+Lawrence County - PA,Pennsylvania benchmark district,Benchmark County,Warehouse fabrication,0,2021,16.2 thousand,16200,0,0
+"Beaver Cnty., PA",Pennsylvania benchmark district,Control,Chemicals and fabricated parts,0,2021,"25,821",25821,0,0
+"Lucas Cnty, Ohio",Ohio funded corridor,AI Grant County,Auto parts and machining,1,2022,33.4k,33400,1,1
+Stark County / OH,Ohio funded corridor,Grant Zone,Fabricated metals,1,2022,"36,640 jobs",36640,1,1
+Mahoning County - Ohio,Ohio funded corridor,Upskilling Cohort,Steel components,1,2022,30.0k,30000,1,1
+"Trumbull Cnty., OH",Ohio funded corridor,Treated,Industrial tooling,1,2022,"25,688 jobs",25688,1,1
+Erie County (PA),Pennsylvania benchmark district,Comparison Area,Machine shops,0,2022,29.9k,29900,1,0
+"Mercer Cnty, Pennsylvania",Pennsylvania benchmark district,No Grant,Plastics and molds,0,2022,"17,637 jobs",17637,1,0
+Lawrence County - PA,Pennsylvania benchmark district,Benchmark County,Warehouse fabrication,0,2022,16.4k,16400,1,0
+"Beaver Cnty., PA",Pennsylvania benchmark district,Control,Chemicals and fabricated parts,0,2022,"26,053 jobs",26053,1,0
+"Lucas Cnty, Ohio",Ohio funded corridor,AI Grant County,Auto parts and machining,1,2023,34.6 K,34600,1,1
+Stark County / OH,Ohio funded corridor,Grant Zone,Fabricated metals,1,2023,~38.0k,38000,1,1
+Mahoning County - Ohio,Ohio funded corridor,Upskilling Cohort,Steel components,1,2023,31.2 K,31200,1,1
+"Trumbull Cnty., OH",Ohio funded corridor,Treated,Industrial tooling,1,2023,~26.9k,26900,1,1
+Erie County (PA),Pennsylvania benchmark district,Comparison Area,Machine shops,0,2023,30.2 K,30200,1,0
+"Mercer Cnty, Pennsylvania",Pennsylvania benchmark district,No Grant,Plastics and molds,0,2023,~17.9k,17900,1,0
+Lawrence County - PA,Pennsylvania benchmark district,Benchmark County,Warehouse fabrication,0,2023,16.7 K,16700,1,0
+"Beaver Cnty., PA",Pennsylvania benchmark district,Control,Chemicals and fabricated parts,0,2023,~26.4k,26400,1,0
+"Lucas Cnty, Ohio",Ohio funded corridor,AI Grant County,Auto parts and machining,1,2024,"36,645",36645,1,1
+Stark County / OH,Ohio funded corridor,Grant Zone,Fabricated metals,1,2024,40.1 thousand,40100,1,1
+Mahoning County - Ohio,Ohio funded corridor,Upskilling Cohort,Steel components,1,2024,"33,215",33215,1,1
+"Trumbull Cnty., OH",Ohio funded corridor,Treated,Industrial tooling,1,2024,28.9 thousand,28900,1,1
+Erie County (PA),Pennsylvania benchmark district,Comparison Area,Machine shops,0,2024,"30,402",30402,1,0
+"Mercer Cnty, Pennsylvania",Pennsylvania benchmark district,No Grant,Plastics and molds,0,2024,18.2 thousand,18200,1,0
+Lawrence County - PA,Pennsylvania benchmark district,Benchmark County,Warehouse fabrication,0,2024,"16,926",16926,1,0
+"Beaver Cnty., PA",Pennsylvania benchmark district,Control,Chemicals and fabricated parts,0,2024,26.6 thousand,26600,1,0
+"Lucas Cnty, Ohio",Ohio funded corridor,AI Grant County,Auto parts and machining,1,2025,"39,500 jobs",39500,1,1
+Stark County / OH,Ohio funded corridor,Grant Zone,Fabricated metals,1,2025,43.0k,43000,1,1
+Mahoning County - Ohio,Ohio funded corridor,Upskilling Cohort,Steel components,1,2025,"36,035 jobs",36035,1,1
+"Trumbull Cnty., OH",Ohio funded corridor,Treated,Industrial tooling,1,2025,31.6k,31600,1,1
+Erie County (PA),Pennsylvania benchmark district,Comparison Area,Machine shops,0,2025,"30,634 jobs",30634,1,0
+"Mercer Cnty, Pennsylvania",Pennsylvania benchmark district,No Grant,Plastics and molds,0,2025,18.4k,18400,1,0
+Lawrence County - PA,Pennsylvania benchmark district,Benchmark County,Warehouse fabrication,0,2025,"17,167 jobs",17167,1,0
+"Beaver Cnty., PA",Pennsylvania benchmark district,Control,Chemicals and fabricated parts,0,2025,26.9k,26900,1,0
