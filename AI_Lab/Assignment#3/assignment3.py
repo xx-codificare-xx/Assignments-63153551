@@ -150,3 +150,136 @@ print(f"\n[CLEAN] Long format: {len(df_long)} rows.")
 print(df_long[['REGION','YEAR','EMPLOYMENT','TREATED','POST_POLICY','DID']].head(10).to_string())
 
 
+# STAGE 3: ANALYZE THE DATA
+
+POLICY_YEAR = 2022
+treated_df = df_long[df_long['TREATED'] == 1]
+control_df = df_long[df_long['TREATED'] == 0]
+
+# Compute group-year means for plotting
+group_year = df_long.groupby(['TREATED', 'YEAR'])['EMPLOYMENT'].mean().reset_index()
+treat_means = group_year[group_year['TREATED'] == 1].sort_values('YEAR')
+ctrl_means  = group_year[group_year['TREATED'] == 0].sort_values('YEAR')
+
+# 3A. VISUAL ANALYSIS — Employment trends over full period
+# Plot employment trends for Treatment and Control
+# groups across all years, marking the policy intervention
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+axes[0].plot(treat_means['YEAR'], treat_means['EMPLOYMENT'],
+             marker='o', color='steelblue', linewidth=2, label='Ohio (Treated)')
+axes[0].plot(ctrl_means['YEAR'], ctrl_means['EMPLOYMENT'],
+             marker='s', color='tomato', linewidth=2, label='Pennsylvania (Control)')
+axes[0].axvline(x=POLICY_YEAR, color='black', linestyle='--',
+                linewidth=1.5, label='Policy Start (2022)')
+axes[0].set_title('Employment Trends: Treatment vs Control', fontsize=12, fontweight='bold')
+axes[0].set_xlabel('Year')
+axes[0].set_ylabel('Mean Employment')
+axes[0].legend()
+axes[0].grid(alpha=0.3)
+
+# 3B. PARALLEL TRENDS TEST
+# Visually and statistically inspect pre-treatment
+# trends to verify groups move in parallel before 2022
+
+pre_treat  = treat_means[treat_means['YEAR'] < POLICY_YEAR]
+pre_ctrl   = ctrl_means[ctrl_means['YEAR'] < POLICY_YEAR]
+
+# Normalize to index = 100 in 2018 for visual parallel trends
+base_t = pre_treat[pre_treat['YEAR'] == 2018]['EMPLOYMENT'].values[0]
+base_c = pre_ctrl[pre_ctrl['YEAR']  == 2018]['EMPLOYMENT'].values[0]
+pre_treat = pre_treat.copy(); pre_treat['INDEX'] = pre_treat['EMPLOYMENT'] / base_t * 100
+pre_ctrl  = pre_ctrl.copy();  pre_ctrl['INDEX']  = pre_ctrl['EMPLOYMENT']  / base_c * 100
+
+axes[1].plot(pre_treat['YEAR'], pre_treat['INDEX'],
+             marker='o', color='steelblue', linewidth=2, label='Ohio (Treated)')
+axes[1].plot(pre_ctrl['YEAR'], pre_ctrl['INDEX'],
+             marker='s', color='tomato', linewidth=2, label='Pennsylvania (Control)')
+axes[1].axvline(x=POLICY_YEAR, color='black', linestyle='--',
+                linewidth=1.5, label='Policy Start (2022)')
+axes[1].set_title('Parallel Trends: Pre-Treatment Index (2018=100)', fontsize=12, fontweight='bold')
+axes[1].set_xlabel('Year')
+axes[1].set_ylabel('Employment Index (2018 = 100)')
+axes[1].legend()
+axes[1].grid(alpha=0.3)
+
+plt.tight_layout()
+plt.savefig('did_trends.png', dpi=150, bbox_inches='tight')
+plt.close()
+print("\n[ANALYZE] Saved did_trends.png")
+
+# Statistically test parallel trends — regress employment on
+# YEAR for each group pre-policy and compare slopes with t-test
+pre_df = df_long[df_long['YEAR'] < POLICY_YEAR].copy()
+treat_pre = pre_df[pre_df['TREATED'] == 1]
+ctrl_pre  = pre_df[pre_df['TREATED'] == 0]
+
+slope_t = np.polyfit(treat_pre['YEAR'], treat_pre['EMPLOYMENT'], 1)[0]
+slope_c = np.polyfit(ctrl_pre['YEAR'],  ctrl_pre['EMPLOYMENT'],  1)[0]
+
+print(f"\n[ANALYZE] Parallel Trends:")
+print(f"  Ohio (Treated) pre-trend slope   : {slope_t:+.1f} jobs/year")
+print(f"  Pennsylvania (Control) pre-trend : {slope_c:+.1f} jobs/year")
+
+# 3C. PLACEBO TEST
+# Conduct a placebo DID using 2020 as a fake
+# treatment year within the pre-treatment window to test
+# for anticipatory effects — coefficient should be ~0
+
+PLACEBO_YEAR = 2020
+placebo_df = df_long[df_long['YEAR'] < POLICY_YEAR].copy()
+placebo_df['POST_PLACEBO'] = (placebo_df['YEAR'] >= PLACEBO_YEAR).astype(int)
+placebo_df['DID_PLACEBO']  = placebo_df['TREATED'] * placebo_df['POST_PLACEBO']
+
+placebo_model = smf.ols(
+    'EMPLOYMENT ~ TREATED + POST_PLACEBO + DID_PLACEBO',
+    data=placebo_df
+).fit()
+placebo_coef = placebo_model.params['DID_PLACEBO']
+placebo_pval = placebo_model.pvalues['DID_PLACEBO']
+
+print(f"\n[ANALYZE] Placebo Test (fake year = {PLACEBO_YEAR}):")
+print(f"  Placebo DID coefficient: {placebo_coef:+.1f}  (p={placebo_pval:.4f})")
+print(f"  {'PASS — no anticipatory effect' if placebo_pval > 0.05 else 'FAIL — anticipatory effect detected'}")
+
+# 3D. DID ESTIMATION — Fixed Effects Regression
+# Run fixed-effects DID regression with TREATED,
+# POST_POLICY, and their interaction (DID) to estimate
+# the causal effect of the AI training subsidy
+
+did_model = smf.ols(
+    'EMPLOYMENT ~ TREATED + POST_POLICY + DID',
+    data=df_long
+).fit()
+
+did_coef = did_model.params['DID']
+did_pval = did_model.pvalues['DID']
+did_ci   = did_model.conf_int().loc['DID']
+
+print(f"\n[ANALYZE] DID Regression Results:")
+print(did_model.summary())
+print(f"\n  DID Coefficient (ATE): {did_coef:+.1f} jobs  (p={did_pval:.4f})")
+print(f"  95% CI: [{did_ci[0]:+.1f}, {did_ci[1]:+.1f}]")
+
+# Save summary
+summary = {
+    'did_coef':      round(did_coef, 2),
+    'did_pval':      round(did_pval, 4),
+    'did_ci_low':    round(float(did_ci[0]), 2),
+    'did_ci_high':   round(float(did_ci[1]), 2),
+    'placebo_coef':  round(placebo_coef, 2),
+    'placebo_pval':  round(placebo_pval, 4),
+    'slope_treated': round(slope_t, 2),
+    'slope_control': round(slope_c, 2),
+    'mean_emp_treat_pre':  round(treat_pre['EMPLOYMENT'].mean(), 1),
+    'mean_emp_treat_post': round(treated_df[treated_df['YEAR'] >= POLICY_YEAR]['EMPLOYMENT'].mean(), 1),
+    'mean_emp_ctrl_pre':   round(ctrl_pre['EMPLOYMENT'].mean(), 1),
+    'mean_emp_ctrl_post':  round(control_df[control_df['YEAR'] >= POLICY_YEAR]['EMPLOYMENT'].mean(), 1),
+}
+with open('analysis_summary_a3.json', 'w') as f:
+    json.dump(summary, f, indent=2)
+print("\n[ANALYZE] Saved analysis_summary_a3.json")
+
+
+

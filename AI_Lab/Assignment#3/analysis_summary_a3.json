@@ -1,0 +1,14 @@
+{
+  "did_coef": 4000.37,
+  "did_pval": 0.1331,
+  "did_ci_low": -1254.86,
+  "did_ci_high": 9255.61,
+  "placebo_coef": -3.25,
+  "placebo_pval": 0.9993,
+  "slope_treated": -455.8,
+  "slope_control": -455.2,
+  "mean_emp_treat_pre": 29788.5,
+  "mean_emp_treat_post": 34088.9,
+  "mean_emp_ctrl_pre": 22601.1,
+  "mean_emp_ctrl_post": 22901.2
+}
