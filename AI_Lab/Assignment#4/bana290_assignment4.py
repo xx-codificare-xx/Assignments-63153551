@@ -82,3 +82,77 @@ df_master.to_csv('raw_data_a4.csv', index=False)
 print(f"\n[SCRAPE] Master dataset: {len(df_master)} rows, {len(df_master.columns)} columns.")
 
 
+# STAGE 2: CLEAN THE DATA
+# Extract numeric values from DISTANCE_TO_NODE using
+# regex, convert km to meters for a uniform unit, parse
+# AI_INTENSITY and INNOVATION_SCORE removing text suffixes,
+# parse ELIGIBILITY_SCORE stripping label prefixes, handle
+# outliers using the IQR capping method on AI_INTENSITY and
+# INNOVATION_SCORE, and create ABOVE_CUTOFF dummy for RDD.
+
+df = df_master.copy()
+
+# Clean DISTANCE_TO_NODE — extract numeric value and
+# convert all units to meters (km * 1000)
+def parse_distance(val):
+    if pd.isna(val): return np.nan
+    s = str(val).lower()
+    num_match = re.search(r'[\d,]+\.?\d*', s.replace(',', ''))
+    if not num_match: return np.nan
+    num = float(num_match.group().replace(',', ''))
+    if 'km' in s or 'kilometer' in s:
+        return num * 1000
+    return num  # already in meters
+
+df['DISTANCE_M'] = df['DISTANCE_TO_NODE'].apply(parse_distance)
+
+# Parse AI_INTENSITY — strip text units using regex
+def parse_numeric(val):
+    if pd.isna(val): return np.nan
+    s = str(val).replace('~', '').replace(',', '').strip()
+    match = re.search(r'[\d.]+', s)
+    try: return float(match.group()) if match else np.nan
+    except: return np.nan
+
+df['AI_INTENSITY']    = df['AI_INTENSITY'].apply(parse_numeric)
+df['INNOVATION_SCORE'] = df['INNOVATION_SCORE'].apply(parse_numeric)
+
+# Parse ELIGIBILITY_SCORE — remove label prefixes like
+# "Pitch rating =", "panel avg", "Score:", "points" etc.
+def parse_eligibility(val):
+    if pd.isna(val): return np.nan
+    s = str(val)
+    match = re.search(r'[\d.]+', s)
+    try: return float(match.group()) if match else np.nan
+    except: return np.nan
+
+df['ELIGIBILITY_SCORE'] = df['ELIGIBILITY_SCORE'].apply(parse_eligibility)
+
+# Handle outliers in AI_INTENSITY and INNOVATION_SCORE
+# using the IQR method — clip values to [Q1 - 1.5*IQR, Q3 + 1.5*IQR]
+def iqr_clip(series):
+    q1, q3 = series.quantile(0.25), series.quantile(0.75)
+    iqr    = q3 - q1
+    lower, upper = q1 - 1.5 * iqr, q3 + 1.5 * iqr
+    return series.clip(lower=lower, upper=upper)
+
+df['AI_INTENSITY']     = iqr_clip(df['AI_INTENSITY'])
+df['INNOVATION_SCORE'] = iqr_clip(df['INNOVATION_SCORE'])
+
+# Create ABOVE_CUTOFF dummy for RDD — 1 if ELIGIBILITY_SCORE >= 85
+CUTOFF = 85
+df['ABOVE_CUTOFF'] = (df['ELIGIBILITY_SCORE'] >= CUTOFF).astype(int)
+
+# Create centered running variable for RDD
+df['SCORE_CENTERED'] = df['ELIGIBILITY_SCORE'] - CUTOFF
+
+df.dropna(subset=['DISTANCE_M','AI_INTENSITY','INNOVATION_SCORE','ELIGIBILITY_SCORE'],
+          inplace=True)
+df.reset_index(drop=True, inplace=True)
+df.to_csv('cleaned_data_a4.csv', index=False)
+
+print(f"\n[CLEAN] {len(df)} rows after cleaning.")
+print(df[['TEAM_REF','DISTANCE_M','AI_INTENSITY','INNOVATION_SCORE',
+          'ELIGIBILITY_SCORE','ABOVE_CUTOFF']].head(8).to_string())
+
+
